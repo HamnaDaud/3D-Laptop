@@ -1,0 +1,28 @@
+{
+  "name": "3d-laptop",
+  "version": "1.0.0",
+  "description": "",
+  "main": "script.js",
+  "scripts": {
+  "dev": "vite",
+  "build": "vite build"
+},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HamnaDaud/3D-Laptop.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/HamnaDaud/3D-Laptop/issues"
+  },
+  "homepage": "https://github.com/HamnaDaud/3D-Laptop#readme",
+  "dependencies": {
+    "three": "^0.185.1"
+  },
+  "devDependencies": {
+    "vite": "^8.1.4"
+  }
+}
