@@ -57,6 +57,9 @@ const purpleLight2 = new THREE.PointLight(0x6a11cb, 6, 15);
 purpleLight2.position.set(4, 1, -3);
 scene.add(purpleLight2);
 
+// ===== Model name badge in banner =====
+const modelNameText = document.getElementById('modelNameText');
+
 // ===== Spec/Tab Content =====
 const SPEC_DATA = {
     overview: {
@@ -200,6 +203,7 @@ loader.load(
         });
 
         scene.add(laptop);
+        modelNameText.textContent = 'ASUS ROG Laptop';
 
         // ---- Bounding box from visible meshes only ----
         const box = new THREE.Box3();
@@ -255,6 +259,7 @@ loader.load(
     },
     function (error) {
         console.error("Error loading model:", error);
+        modelNameText.textContent = 'Failed to load model';
     }
 );
 
