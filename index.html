@@ -25,26 +25,37 @@
     <!-- Floating particles -->
     <div id="particles" class="particles"></div>
 
-    <!-- Description Card -->
+    <!-- Hotspot markers, positioned over the 3D model -->
+    <div id="hotspots"></div>
+
+    <!-- Interactive Description / Spec Card -->
     <section class="description-card" id="descCard">
         <div class="desc-header">
             <span class="pulse-dot"></span>
-            <h2>ASUS ROG Laptop</h2>
+            <h2 id="descTitle">ASUS ROG Laptop</h2>
         </div>
-        <p>
+
+        <div class="tabs" id="tabs">
+            <button class="tab-btn active" data-tab="overview">🖥️ Overview</button>
+            <button class="tab-btn" data-tab="display">🎨 Display</button>
+            <button class="tab-btn" data-tab="performance">⚡ Performance</button>
+            <button class="tab-btn" data-tab="design">🔌 Design</button>
+        </div>
+
+        <p id="descText">
             A sleek matte-black powerhouse built for performance and style.
-            Featuring a precision-crafted aluminum chassis, vivid display,
-            and RGB-backlit keyboard — drag to rotate and scroll to zoom in
-            for a closer look.
+            Click a glowing marker on the laptop, or a tab above, to explore
+            its features.
         </p>
-        <div class="tags">
+
+        <div class="tags" id="descTags">
             <span class="tag">Matte Black</span>
             <span class="tag">Aluminum Body</span>
             <span class="tag">RGB Keyboard</span>
         </div>
     </section>
 
-    <div class="hint">🖱️ Drag to rotate · Scroll to zoom</div>
+    <div class="hint">🖱️ Drag to rotate · Scroll to zoom · Click a marker to explore</div>
 
     <script type="module" src="script.js"></script>
 </body>

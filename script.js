@@ -57,6 +57,115 @@ const purpleLight2 = new THREE.PointLight(0x6a11cb, 6, 15);
 purpleLight2.position.set(4, 1, -3);
 scene.add(purpleLight2);
 
+// ===== Spec/Tab Content =====
+const SPEC_DATA = {
+    overview: {
+        title: 'ASUS ROG Laptop',
+        text: 'A sleek matte-black powerhouse built for performance and style. Precision-crafted aluminum chassis meets serious gaming muscle underneath.',
+        tags: ['Matte Black', 'Aluminum Body', 'RGB Keyboard']
+    },
+    display: {
+        title: 'Display',
+        text: 'A vivid, high-refresh panel with slim bezels for maximum screen-to-body ratio — sharp text, punchy color, and smooth motion for gaming or creative work.',
+        tags: ['High Refresh', 'Slim Bezel', 'Anti-Glare']
+    },
+    performance: {
+        title: 'Performance',
+        text: 'Powered by the latest-gen processor and discrete graphics, with advanced cooling to keep clock speeds high even under sustained load.',
+        tags: ['Discrete GPU', 'Fast Cooling', 'High Clock Speed']
+    },
+    design: {
+        title: 'Design & Ports',
+        text: 'A full suite of connectivity built into a slim aluminum frame — USB-C, HDMI, and fast Wi-Fi, all wrapped in a durable matte-black finish.',
+        tags: ['USB-C', 'HDMI', 'Wi-Fi 6']
+    }
+};
+
+// ===== Hotspots (positions estimated relative to model size) =====
+// offset is a multiplier of maxDim, applied around the recentered origin.
+// Adjust these once you see where they land on your specific model.
+const HOTSPOTS = [
+    { tab: 'display',     offset: new THREE.Vector3(0, 0.35, -0.15) },   // screen area
+    { tab: 'performance', offset: new THREE.Vector3(0, 0.02, 0.15) },    // keyboard/body
+    { tab: 'design',      offset: new THREE.Vector3(0.42, 0, 0) },       // side ports
+    { tab: 'overview',    offset: new THREE.Vector3(0, -0.08, 0.35) }    // front/logo
+];
+
+const hotspotContainer = document.getElementById('hotspots');
+const hotspotEls = [];
+let modelMaxDim = 1;
+
+function buildHotspots() {
+    HOTSPOTS.forEach((spot) => {
+        const el = document.createElement('div');
+        el.classList.add('hotspot');
+        el.dataset.tab = spot.tab;
+        el.addEventListener('click', () => setActiveTab(spot.tab));
+        hotspotContainer.appendChild(el);
+        hotspotEls.push({ el, worldPos: spot.offset.clone().multiplyScalar(modelMaxDim) });
+    });
+}
+
+function toScreenPosition(vector3) {
+    const widthHalf = renderer.domElement.clientWidth / 2;
+    const heightHalf = renderer.domElement.clientHeight / 2;
+    const pos = vector3.clone().project(camera);
+    return {
+        x: (pos.x * widthHalf) + widthHalf,
+        y: -(pos.y * heightHalf) + heightHalf,
+        visible: pos.z < 1
+    };
+}
+
+function updateHotspotPositions() {
+    hotspotEls.forEach(({ el, worldPos }) => {
+        const screenPos = toScreenPosition(worldPos);
+        el.style.left = `${screenPos.x}px`;
+        el.style.top = `${screenPos.y}px`;
+        el.style.display = screenPos.visible ? 'block' : 'none';
+    });
+}
+
+// ===== Tab / Card Logic =====
+const descTitle = document.getElementById('descTitle');
+const descText = document.getElementById('descText');
+const descTags = document.getElementById('descTags');
+const tabButtons = document.querySelectorAll('.tab-btn');
+
+function setActiveTab(tabId) {
+    const data = SPEC_DATA[tabId];
+    if (!data) return;
+
+    // update card content with a small fade-swap animation
+    descTitle.textContent = data.title;
+    descText.classList.remove('fade-swap');
+    void descText.offsetWidth; // restart animation
+    descText.classList.add('fade-swap');
+    descText.textContent = data.text;
+
+    descTags.innerHTML = '';
+    data.tags.forEach((tag) => {
+        const span = document.createElement('span');
+        span.classList.add('tag');
+        span.textContent = tag;
+        descTags.appendChild(span);
+    });
+
+    // sync tab buttons
+    tabButtons.forEach((btn) => {
+        btn.classList.toggle('active', btn.dataset.tab === tabId);
+    });
+
+    // sync hotspot markers
+    hotspotEls.forEach(({ el }) => {
+        el.classList.toggle('active', el.dataset.tab === tabId);
+    });
+}
+
+tabButtons.forEach((btn) => {
+    btn.addEventListener('click', () => setActiveTab(btn.dataset.tab));
+});
+
 // ===== Load Laptop Model =====
 const loader = new GLTFLoader();
 let laptop;
@@ -122,6 +231,7 @@ loader.load(
 
         // Auto-fit camera based on real model size
         const maxDim = Math.max(size.x, size.y, size.z);
+        modelMaxDim = maxDim;
         const fitDistance = maxDim * 1.8;
 
         camera.position.set(0, maxDim * 0.2, fitDistance);
@@ -133,6 +243,10 @@ loader.load(
         controls.minDistance = maxDim * 0.6;
         controls.maxDistance = maxDim * 4;
         controls.update();
+
+        // Now that we know the model's real size, place the hotspots
+        buildHotspots();
+        setActiveTab('overview');
 
         console.log("Laptop loaded. Bounding size:", size, "Original center:", center);
     },
@@ -160,6 +274,7 @@ function animate() {
     purpleLight2.intensity = 5 + Math.cos(t * 2) * 1.5;
 
     controls.update();
+    updateHotspotPositions();
     renderer.render(scene, camera);
 }
 animate();
