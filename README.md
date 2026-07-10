@@ -29,8 +29,7 @@ This project is an interactive 3D laptop viewer built using Three.js. It loads a
 ## Tools, Libraries & Assets Used
 
 ### Technologies & Libraries
-- HTML5
-- CSS3
+- Tailwind CSS
 - JavaScript (ES Modules)
 - Three.js
   - `GLTFLoader`
