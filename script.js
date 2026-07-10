@@ -292,12 +292,16 @@ window.addEventListener('resize', () => {
 });
 
 // ===== Dark Mode Toggle =====
+// Tailwind's `dark:` variant matches `.dark` on an ancestor element, so the
+// toggle now lives on <html> instead of <body> (the standard Tailwind
+// convention) — this lets body's own dark: utility classes (background,
+// animation) respond correctly too.
 const modeToggle = document.getElementById('modeToggle');
 const modeIcon = document.getElementById('modeIcon');
 
 modeToggle.addEventListener('click', () => {
-    document.body.classList.toggle('dark');
-    const isDark = document.body.classList.contains('dark');
+    document.documentElement.classList.toggle('dark');
+    const isDark = document.documentElement.classList.contains('dark');
     modeIcon.textContent = isDark ? '☀️' : '🌙';
 });
 

@@ -4,62 +4,223 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>XI Pulse | 3D Laptop Viewer</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
 
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' };
+    </script>
+
+    <!--
+      Theme tokens as CSS variables (swapped by the `.dark` class on <html>).
+      Tailwind's utility classes below read these via arbitrary values,
+      e.g. bg-[color:var(--card-bg)], so every color still flows through
+      Tailwind's class system instead of a separate stylesheet.
+    -->
+    <style>
+        :root {
+            --bg: #ffffff;
+            --purple-1: #a020f0;
+            --purple-2: #6a11cb;
+            --text: #1b0e2e;
+            --text-soft: #5c4b7a;
+            --card-bg: rgba(255, 255, 255, 0.75);
+            --card-border: rgba(160, 32, 240, 0.25);
+            --banner-bg: rgba(255, 255, 255, 0.6);
+        }
+        .dark {
+            --bg: #060310;
+            --purple-1: #c86dff;
+            --purple-2: #9b30ff;
+            --text: #f2eaff;
+            --text-soft: #c9b8ea;
+            --card-bg: rgba(20, 10, 35, 0.65);
+            --card-border: rgba(200, 100, 255, 0.45);
+            --banner-bg: rgba(15, 8, 28, 0.55);
+        }
+    </style>
+
+    <!--
+      Keyframes (Tailwind has no keyframe authoring UI of its own, so these
+      live here and are invoked from utility classes via arbitrary
+      `[animation:name_duration_...]` values) plus @layer components for
+      the classes script.js toggles at runtime (hotspot, tag, tab-btn,
+      fade-swap, particle) using @apply.
+    -->
+    <style type="text/tailwindcss">
+        @keyframes bg-drift {
+            0%, 100% { background-position: 50% 40%, 0 0; }
+            50% { background-position: 52% 43%, 0 0; }
+        }
+        @keyframes bg-drift-neon {
+            0%, 100% { background-position: 50% 40%, 0 0; filter: brightness(1); }
+            50% { background-position: 53% 45%, 0 0; filter: brightness(1.15); }
+        }
+        @keyframes float-up {
+            0% { transform: translateY(0); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(-100vh); opacity: 0; }
+        }
+        @keyframes hotspot-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(160, 32, 240, 0.6), 0 0 12px rgba(160, 32, 240, 0.8); }
+            70% { box-shadow: 0 0 0 14px rgba(160, 32, 240, 0), 0 0 12px rgba(160, 32, 240, 0.8); }
+            100% { box-shadow: 0 0 0 0 rgba(160, 32, 240, 0), 0 0 12px rgba(160, 32, 240, 0.8); }
+        }
+        @keyframes pulse-dot {
+            0% { box-shadow: 0 0 0 0 rgba(160, 32, 240, 0.6); }
+            70% { box-shadow: 0 0 0 10px rgba(160, 32, 240, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(160, 32, 240, 0); }
+        }
+        @keyframes slide-in {
+            from { opacity: 0; margin-bottom: -40px; }
+            to { opacity: 1; margin-bottom: 0; }
+        }
+        @keyframes fade-swap {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes tag-pop {
+            from { opacity: 0; transform: translateY(6px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes fade-in-out {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        @layer components {
+            .hotspot {
+                @apply absolute w-[22px] h-[22px] -mt-[11px] -ml-[11px] rounded-full border-2 border-white cursor-pointer pointer-events-auto transition-transform duration-200 ease-out;
+                background: var(--purple-1);
+                animation: hotspot-pulse 2s infinite;
+            }
+            .hotspot:hover { @apply scale-[1.3]; }
+            .hotspot.active {
+                @apply scale-125;
+                background: #fff;
+                border-color: var(--purple-1);
+            }
+
+            .tag {
+                @apply text-[11px] py-[5px] px-[10px] rounded-full border;
+                border-color: var(--card-border);
+                color: var(--purple-1);
+                background: rgba(160, 32, 240, 0.08);
+                animation: tag-pop 0.35s ease both;
+            }
+
+            .fade-swap {
+                animation: fade-swap 0.3s ease both;
+            }
+
+            .particle {
+                @apply absolute rounded-full pointer-events-none;
+                background: var(--purple-1);
+                opacity: 0.5;
+                box-shadow: 0 0 8px var(--purple-1);
+                animation: float-up linear infinite;
+            }
+            .dark .particle {
+                box-shadow: 0 0 14px var(--purple-1), 0 0 4px var(--purple-1);
+            }
+
+            .tab-btn {
+                @apply text-[11.5px] py-[6px] px-[10px] rounded-full border bg-transparent cursor-pointer whitespace-nowrap transition-all duration-200;
+                border-color: var(--card-border);
+                color: var(--text-soft);
+            }
+            .tab-btn:hover {
+                color: var(--purple-1);
+                border-color: var(--purple-1);
+            }
+            .tab-btn.active {
+                @apply text-white border-transparent;
+                background: linear-gradient(90deg, var(--purple-1), var(--purple-2));
+                box-shadow: 0 0 12px rgba(160, 32, 240, 0.5);
+            }
+        }
+    </style>
+</head>
+<body
+    class="m-0 overflow-hidden bg-[color:var(--bg)] text-[color:var(--text)] transition-colors duration-500
+           bg-no-repeat [background-size:140%_140%] dark:[background-size:160%_160%]
+           [background-image:radial-gradient(circle_at_50%_40%,rgba(160,32,240,0.18)_0%,rgba(160,32,240,0.08)_25%,transparent_55%)]
+           dark:[background-image:radial-gradient(circle_at_50%_40%,rgba(200,100,255,0.55)_0%,rgba(160,32,240,0.3)_22%,rgba(106,17,203,0.12)_45%,transparent_65%)]
+           [animation:bg-drift_10s_ease-in-out_infinite] dark:[animation:bg-drift-neon_6s_ease-in-out_infinite]
+           before:content-[''] before:fixed before:inset-0 before:pointer-events-none before:z-[1]
+           before:[background-image:repeating-linear-gradient(0deg,rgba(160,32,240,0.05)_0_1px,transparent_1px_60px),repeating-linear-gradient(90deg,rgba(160,32,240,0.05)_0_1px,transparent_1px_60px)]"
+    style="font-family: 'Segoe UI', system-ui, sans-serif;"
+>
     <!-- Top Banner -->
-    <header class="banner">
-        <div class="banner-left">
-            <img src="assets/xi-pulse-logo.png" alt="XI Pulse Logo" class="logo">
-            <div class="banner-text">
-                <h1>XI PULSE</h1>
-                <span>3D Product Viewer</span>
+    <header class="fixed top-0 left-0 right-0 h-[72px] flex items-center justify-between px-7 z-10
+                    backdrop-blur-[12px] border-b
+                    bg-[color:var(--banner-bg)] border-[color:var(--card-border)]">
+        <div class="flex items-center gap-3.5">
+            <img src="assets/xi-pulse-logo.png" alt="XI Pulse Logo"
+                 class="h-[42px] w-auto [filter:drop-shadow(0_0_8px_rgba(160,32,240,0.6))]">
+            <div class="flex flex-col">
+                <h1 class="m-0 text-xl tracking-[3px] bg-gradient-to-r from-[color:var(--purple-1)] to-[color:var(--purple-2)] bg-clip-text text-transparent">XI PULSE</h1>
+                <span class="text-xs tracking-wide text-[color:var(--text-soft)]">3D Product Viewer</span>
             </div>
-            <div class="model-name-badge" id="modelNameBadge">
-                <span class="model-dot"></span>
+            <div id="modelNameBadge"
+                 class="flex items-center gap-2 ml-6 py-[7px] px-3.5 rounded-full border backdrop-blur-[10px]
+                        text-[13px] font-semibold tracking-[0.5px] transition-opacity duration-300
+                        bg-[color:var(--card-bg)] border-[color:var(--card-border)] text-[color:var(--text)]">
+                <span class="w-[7px] h-[7px] rounded-full shrink-0 bg-[color:var(--purple-1)] [animation:pulse-dot_1.8s_infinite]"></span>
                 <span id="modelNameText">Loading model…</span>
             </div>
         </div>
-        <button id="modeToggle" class="mode-toggle" aria-label="Toggle dark mode">
+        <button id="modeToggle" aria-label="Toggle dark mode"
+                class="w-[42px] h-[42px] rounded-full border cursor-pointer text-lg flex items-center justify-center
+                       transition-transform duration-300 hover:scale-110 hover:rotate-[15deg]
+                       bg-[color:var(--card-bg)] border-[color:var(--card-border)]">
             <span id="modeIcon">🌙</span>
         </button>
     </header>
 
     <!-- Floating particles -->
-    <div id="particles" class="particles"></div>
+    <div id="particles" class="fixed inset-0 pointer-events-none z-[1]"></div>
 
     <!-- Hotspot markers, positioned over the 3D model -->
-    <div id="hotspots"></div>
+    <div id="hotspots" class="fixed inset-0 z-[5] pointer-events-none"></div>
 
     <!-- Interactive Description / Spec Card -->
-    <section class="description-card" id="descCard">
-        <div class="desc-header">
-            <span class="pulse-dot"></span>
-            <h2 id="descTitle">ASUS ROG Laptop</h2>
+    <section id="descCard"
+             class="fixed bottom-7 left-7 w-[400px] max-w-[calc(100vw-56px)] rounded-[18px] border p-[22px_24px_24px] z-20
+                    backdrop-blur-[14px] shadow-[0_8px_30px_rgba(106,17,203,0.2)] origin-bottom-left cursor-default
+                    transition-transform duration-[350ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]
+                    hover:scale-[1.15] hover:shadow-[0_20px_55px_rgba(160,32,240,0.45)]
+                    bg-[color:var(--card-bg)] border-[color:var(--card-border)]
+                    [animation:slide-in_0.9s_cubic-bezier(0.22,1,0.36,1)_0.3s_both]">
+        <div class="flex items-center gap-2 mb-3">
+            <span class="w-[9px] h-[9px] rounded-full shrink-0 bg-[color:var(--purple-1)] [animation:pulse-dot_1.8s_infinite]"></span>
+            <h2 id="descTitle" class="m-0 text-[19px] transition-opacity duration-200 text-[color:var(--text)]">ASUS ROG Laptop</h2>
         </div>
-
-        <div class="tabs" id="tabs">
+        <div class="flex flex-wrap gap-1.5 mb-3.5" id="tabs">
             <button class="tab-btn active" data-tab="overview">🖥️ Overview</button>
             <button class="tab-btn" data-tab="display">🎨 Display</button>
             <button class="tab-btn" data-tab="performance">⚡ Performance</button>
             <button class="tab-btn" data-tab="design">🔌 Design</button>
         </div>
-
-        <p id="descText">
+        <p id="descText"
+           class="m-0 mb-4 text-[14.5px] leading-[1.6] min-h-[65px] transition-opacity duration-200 text-[color:var(--text-soft)]">
             A sleek matte-black powerhouse built for performance and style.
             Click a glowing marker on the laptop, or a tab above, to explore
             its features.
         </p>
-
-        <div class="tags" id="descTags">
+        <div class="flex flex-wrap gap-2" id="descTags">
             <span class="tag">Matte Black</span>
             <span class="tag">Aluminum Body</span>
             <span class="tag">RGB Keyboard</span>
         </div>
     </section>
 
-    <div class="hint">🖱️ Drag to rotate · Scroll to zoom · Click a marker to explore</div>
+    <div class="fixed bottom-7 right-7 text-xs py-2 px-3.5 rounded-full border z-10 backdrop-blur-[10px]
+                [animation:fade-in-out_3s_ease-in-out_infinite]
+                bg-[color:var(--card-bg)] border-[color:var(--card-border)] text-[color:var(--text-soft)]">
+        🖱️ Drag to rotate · Scroll to zoom · Click a marker to explore
+    </div>
 
     <script type="module" src="script.js"></script>
 </body>
