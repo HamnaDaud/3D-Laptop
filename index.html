@@ -3,12 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Laptop Viewer</title>
+    <title>XI Pulse | 3D Laptop Viewer</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<script type="module" src="script.js"></script>
+    <!-- Top Banner -->
+    <header class="banner">
+        <div class="banner-left">
+            <img src="assets/xi-pulse-logo.png" alt="XI Pulse Logo" class="logo">
+            <div class="banner-text">
+                <h1>XI PULSE</h1>
+                <span>3D Product Viewer</span>
+            </div>
+        </div>
+        <button id="modeToggle" class="mode-toggle" aria-label="Toggle dark mode">
+            <span id="modeIcon">🌙</span>
+        </button>
+    </header>
 
+    <!-- Floating particles -->
+    <div id="particles" class="particles"></div>
+
+    <!-- Description Card -->
+    <section class="description-card" id="descCard">
+        <div class="desc-header">
+            <span class="pulse-dot"></span>
+            <h2>ASUS ROG Laptop</h2>
+        </div>
+        <p>
+            A sleek matte-black powerhouse built for performance and style.
+            Featuring a precision-crafted aluminum chassis, vivid display,
+            and RGB-backlit keyboard — drag to rotate and scroll to zoom in
+            for a closer look.
+        </p>
+        <div class="tags">
+            <span class="tag">Matte Black</span>
+            <span class="tag">Aluminum Body</span>
+            <span class="tag">RGB Keyboard</span>
+        </div>
+    </section>
+
+    <div class="hint">🖱️ Drag to rotate · Scroll to zoom</div>
+
+    <script type="module" src="script.js"></script>
 </body>
 </html>
